@@ -6,6 +6,7 @@ export interface Task {
   completed: boolean;
   priority?: 'low' | 'medium' | 'high';
   createdAt: string;
+  timeSpent?: number; // Time spent in seconds
 }
 
 export interface PomodoroSettings {
@@ -26,6 +27,7 @@ export interface TimerState {
   mode: 'work' | 'break' | 'longBreak';
   timeLeft: number;
   sessionsCompleted: number;
+  currentTaskId?: string; // Add current task ID
 }
 
 export interface TaskCompletionData {

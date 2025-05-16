@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useProcrastination } from '@/context/ProcrastinationContext';
 import { TimerState } from '@/types/procrastination';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +9,7 @@ import { toast } from '@/components/ui/sonner';
 import { Clock, Play, Pause, SkipForward, Timer } from 'lucide-react';
 
 const PomodoroTimer = () => {
-  const { pomodoroSettings } = useProcrastination();
+  const { pomodoroSettings, tasks, currentTaskId, setCurrentTaskForTimer, updateTaskTimeSpent } = useProcrastination();
   const [timer, setTimer] = useState<TimerState>({
     isActive: false,
     isPaused: false,
@@ -17,11 +17,29 @@ const PomodoroTimer = () => {
     timeLeft: pomodoroSettings.workDuration * 60,
     sessionsCompleted: 0,
   });
+  
+  // Tracking time for the current task
+  const lastTickRef = useRef<number | null>(null);
+  const dropAreaRef = useRef<HTMLDivElement>(null);
+  
+  // Get current task if any
+  const currentTask = currentTaskId ? tasks.find(task => task.id === currentTaskId) : undefined;
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+  
+  // Format time spent for display (convert seconds to hours and minutes)
+  const formatTimeSpent = (seconds: number): string => {
+    if (!seconds) return '0m';
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    if (hours > 0) {
+      return `${hours}h ${mins}m`;
+    }
+    return `${mins}m`;
   };
 
   // Reset timer with new mode
@@ -65,12 +83,27 @@ const PomodoroTimer = () => {
     );
   }, [timer.mode, timer.sessionsCompleted, pomodoroSettings]);
 
-  // Timer tick effect
+  // Timer tick effect with task time tracking
   useEffect(() => {
     let interval: number | undefined;
 
     if (timer.isActive && !timer.isPaused) {
+      // Set the initial tick time
+      if (lastTickRef.current === null) {
+        lastTickRef.current = Date.now();
+      }
+      
       interval = window.setInterval(() => {
+        const now = Date.now();
+        // Calculate how much time has passed since last tick
+        const elapsed = lastTickRef.current ? (now - lastTickRef.current) / 1000 : 1;
+        lastTickRef.current = now;
+        
+        // Update task time if we have a current task and we're in work mode
+        if (currentTaskId && timer.mode === 'work') {
+          updateTaskTimeSpent(currentTaskId, elapsed);
+        }
+        
         setTimer(current => {
           if (current.timeLeft <= 1) {
             clearInterval(interval);
@@ -86,12 +119,15 @@ const PomodoroTimer = () => {
           return { ...current, timeLeft: current.timeLeft - 1 };
         });
       }, 1000);
+    } else {
+      // Reset the tick reference when timer is not running
+      lastTickRef.current = null;
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [timer.isActive, timer.isPaused]);
+  }, [timer.isActive, timer.isPaused, currentTaskId, timer.mode, updateTaskTimeSpent]);
 
   // Effect to switch modes when timer ends
   useEffect(() => {
@@ -111,11 +147,44 @@ const PomodoroTimer = () => {
   }, [pomodoroSettings]);
 
   const startTimer = () => {
+    // Only allow starting the timer if a task is selected
+    if (!currentTaskId) {
+      toast("No Task Selected", {
+        description: "Please drag a task to the timer first."
+      });
+      return;
+    }
+    
     setTimer(current => ({
       ...current,
       isActive: true,
       isPaused: false,
     }));
+  };
+
+  // Handle drag events for the drop area
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.currentTarget.classList.add('bg-blue-100', 'border-dashed', 'border-blue-400');
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.currentTarget.classList.remove('bg-blue-100', 'border-dashed', 'border-blue-400');
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove('bg-blue-100', 'border-dashed', 'border-blue-400');
+    
+    const taskId = e.dataTransfer.getData('taskId');
+    if (!taskId) return;
+    
+    // Set current task for timer
+    setCurrentTaskForTimer(taskId);
+    
+    toast("Task Set", {
+      description: "Task has been set for the timer. Press Start to begin.",
+    });
   };
 
   const pauseTimer = () => {
@@ -178,10 +247,32 @@ const PomodoroTimer = () => {
           
           <Progress value={calculateProgress()} className={`h-2 w-full mb-4 ${timerColor}`} />
           
-          <div className="text-sm mb-4">
+          <div className="text-sm mb-2">
             {timer.mode === 'work' ? 'Work Session' : timer.mode === 'longBreak' ? 'Long Break' : 'Short Break'}
             {' • '}
             Sessions: {timer.sessionsCompleted}
+          </div>
+          
+          {/* Drop area for task */}
+          <div
+            ref={dropAreaRef}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className="w-full p-3 mb-4 border border-gray-200 rounded-md min-h-[60px] transition-colors"
+          >
+            {currentTask ? (
+              <div className="text-center">
+                <div className="font-medium">{currentTask.title}</div>
+                <div className="text-xs text-muted-foreground">
+                  Time spent: {formatTimeSpent(currentTask.timeSpent || 0)}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-muted-foreground text-sm">
+                Drag a task here to start working on it
+              </div>
+            )}
           </div>
           
           <div className="flex gap-2">

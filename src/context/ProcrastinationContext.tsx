@@ -14,6 +14,9 @@ interface ProcrastinationContextType {
   updatePomodoroSettings: (settings: PomodoroSettings) => void;
   incrementDistraction: () => void;
   resetDailyStats: () => void;
+  setCurrentTaskForTimer: (taskId: string | undefined) => void;
+  currentTaskId?: string;
+  updateTaskTimeSpent: (taskId: string, additionalTime: number) => void;
 }
 
 const defaultPomodoroSettings: PomodoroSettings = {
@@ -33,6 +36,7 @@ export const ProcrastinationProvider = ({ children }: { children: React.ReactNod
     lastDate: new Date().toDateString()
   });
   const [isFirstVisit, setIsFirstVisit] = useState(true);
+  const [currentTaskId, setCurrentTaskId] = useState<string | undefined>(undefined);
 
   // Load data from localStorage on mount and check if it's first visit
   useEffect(() => {
@@ -146,7 +150,8 @@ export const ProcrastinationProvider = ({ children }: { children: React.ReactNod
       ...task,
       id: Date.now().toString(),
       completed: task.completed,
-      createdAt: task.createdAt
+      createdAt: task.createdAt,
+      timeSpent: 0 // Initialize time spent to 0
     };
     setTasks(currentTasks => [...currentTasks, newTask]);
   };
@@ -160,6 +165,9 @@ export const ProcrastinationProvider = ({ children }: { children: React.ReactNod
   };
 
   const deleteTask = (id: string) => {
+    if (currentTaskId === id) {
+      setCurrentTaskId(undefined);
+    }
     setTasks(currentTasks => currentTasks.filter(task => task.id !== id));
   };
 
@@ -181,6 +189,20 @@ export const ProcrastinationProvider = ({ children }: { children: React.ReactNod
     });
   };
 
+  const setCurrentTaskForTimer = (taskId: string | undefined) => {
+    setCurrentTaskId(taskId);
+  };
+
+  const updateTaskTimeSpent = (taskId: string, additionalTime: number) => {
+    setTasks(currentTasks => 
+      currentTasks.map(task => 
+        task.id === taskId 
+          ? { ...task, timeSpent: (task.timeSpent || 0) + additionalTime } 
+          : task
+      )
+    );
+  };
+
   return (
     <ProcrastinationContext.Provider value={{
       tasks,
@@ -192,7 +214,10 @@ export const ProcrastinationProvider = ({ children }: { children: React.ReactNod
       deleteTask,
       updatePomodoroSettings,
       incrementDistraction,
-      resetDailyStats
+      resetDailyStats,
+      setCurrentTaskForTimer,
+      currentTaskId,
+      updateTaskTimeSpent
     }}>
       {children}
     </ProcrastinationContext.Provider>

@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/sonner';
-import { ListTodo, Plus, Trash2 } from 'lucide-react';
+import { ListTodo, Plus, Trash2, Clock } from 'lucide-react';
 
 const TaskList = () => {
   const { tasks, addTask, toggleTaskCompletion, deleteTask } = useProcrastination();
@@ -34,7 +34,8 @@ const TaskList = () => {
       description: newTaskDescription.trim(),
       priority: newTaskPriority,
       completed: false,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      timeSpent: 0
     });
 
     toast('Task Added', {
@@ -47,6 +48,17 @@ const TaskList = () => {
     setDialogOpen(false);
   };
 
+  // Format time spent for display (convert seconds to hours and minutes)
+  const formatTimeSpent = (seconds: number = 0): string => {
+    if (!seconds) return '0m';
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    if (hours > 0) {
+      return `${hours}h ${mins}m`;
+    }
+    return `${mins}m`;
+  };
+
   const getPriorityClass = (priority?: 'low' | 'medium' | 'high') => {
     switch (priority) {
       case 'high': return 'bg-red-100 border-l-4 border-red-500 dark:bg-red-900/20';
@@ -54,6 +66,16 @@ const TaskList = () => {
       case 'low': return 'bg-green-100 border-l-4 border-green-500 dark:bg-green-900/20';
       default: return '';
     }
+  };
+
+  // Handle drag start event
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, taskId: string) => {
+    e.dataTransfer.setData('taskId', taskId);
+    e.currentTarget.classList.add('opacity-50');
+  };
+
+  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+    e.currentTarget.classList.remove('opacity-50');
   };
 
   return (
@@ -133,7 +155,10 @@ const TaskList = () => {
             {tasks.map((task) => (
               <div 
                 key={task.id} 
-                className={`p-3 rounded-md flex items-start gap-3 transition-colors ${getPriorityClass(task.priority)}`}
+                className={`p-3 rounded-md flex items-start gap-3 transition-colors ${getPriorityClass(task.priority)} cursor-move`}
+                draggable={true}
+                onDragStart={(e) => handleDragStart(e, task.id)}
+                onDragEnd={handleDragEnd}
               >
                 <Checkbox 
                   checked={task.completed} 
@@ -149,6 +174,10 @@ const TaskList = () => {
                       {task.description}
                     </div>
                   )}
+                  <div className="text-xs mt-1 flex items-center text-muted-foreground">
+                    <Clock className="h-3 w-3 mr-1" />
+                    Time spent: {formatTimeSpent(task.timeSpent)}
+                  </div>
                 </div>
                 <Button 
                   variant="ghost" 
