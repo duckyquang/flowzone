@@ -2,11 +2,10 @@
 import React from 'react';
 import { useProcrastination } from '@/context/ProcrastinationContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Bell } from 'lucide-react';
 
 const DistractionTracker = () => {
-  const { distractions, resetDailyStats } = useProcrastination();
+  const { distractions } = useProcrastination();
 
   const getMessageBasedOnDistractions = () => {
     if (distractions.count === 0) {
@@ -33,9 +32,6 @@ const DistractionTracker = () => {
           <div className="text-4xl font-bold mb-2">{distractions.count}</div>
           <div className="text-sm text-muted-foreground mb-4">Number of Distracted Moments Today</div>
           <div className="text-sm mb-4">{getMessageBasedOnDistractions()}</div>
-          <Button variant="outline" size="sm" onClick={resetDailyStats}>
-            Reset Counter
-          </Button>
         </div>
       </CardContent>
     </Card>

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { toast } from '@/components/ui/sonner';
 import { Clock, Play, Pause, SkipForward, Timer } from 'lucide-react';
+import PomodoroSettingsDialog from './PomodoroSettingsDialog';
 
 const PomodoroTimer = () => {
   const { pomodoroSettings, tasks, currentTaskId, setCurrentTaskForTimer, updateTaskTimeSpent } = useProcrastination();
@@ -233,10 +234,13 @@ const PomodoroTimer = () => {
   return (
     <Card className="w-full">
       <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2">
-          <Timer className="h-5 w-5" />
-          Pomodoro Timer
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Timer className="h-5 w-5" />
+            Pomodoro Timer
+          </CardTitle>
+          <PomodoroSettingsDialog />
+        </div>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col items-center">
