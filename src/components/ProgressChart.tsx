@@ -69,14 +69,14 @@ const ProgressChart = () => {
           Productivity Progress
         </CardTitle>
       </CardHeader>
-      <CardContent className="h-[calc(100%-60px)]">
+      <CardContent className="pt-0 h-[calc(100%-60px)]">
         <Tabs defaultValue="completion">
           <TabsList className="mb-4 grid grid-cols-2">
             <TabsTrigger value="completion">Task Completion</TabsTrigger>
             <TabsTrigger value="timeSpent">Time Spent</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="completion" className="h-[350px]">
+          <TabsContent value="completion" className="h-[320px]">
             <div className="mb-4 flex flex-wrap gap-4 items-center justify-center sm:justify-between">
               <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-md">
                 <CheckCheck className="text-focus-green h-5 w-5" />
@@ -125,7 +125,7 @@ const ProgressChart = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="timeSpent" className="h-[350px]">
+          <TabsContent value="timeSpent" className="h-[320px]">
             <div className="mb-4 flex items-center gap-2 bg-muted/50 p-2 rounded-md">
               <Clock className="h-5 w-5 text-focus-blue" />
               <div>

@@ -1,11 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useProcrastination } from '@/context/ProcrastinationContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
 import { 
   Dialog, 
   DialogContent, 
@@ -24,6 +25,27 @@ const TaskList = () => {
   const [newTaskDescription, setNewTaskDescription] = useState('');
   const [newTaskPriority, setNewTaskPriority] = useState<'low' | 'medium' | 'high'>('medium');
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Sort tasks by priority and completion status
+  const sortedTasks = useMemo(() => {
+    const priorityOrder = { high: 0, medium: 1, low: 2, undefined: 3 };
+    
+    // First separate completed and uncompleted tasks
+    const uncompletedTasks = tasks.filter(task => !task.completed);
+    const completedTasks = tasks.filter(task => task.completed);
+    
+    // Sort uncompleted tasks by priority
+    const sortedUncompleted = [...uncompletedTasks].sort((a, b) => {
+      const aPriority = a.priority || 'undefined';
+      const bPriority = b.priority || 'undefined';
+      return priorityOrder[aPriority] - priorityOrder[bPriority];
+    });
+    
+    // Sort completed tasks by most recently completed (assuming most recent is at the top)
+    const sortedCompleted = [...completedTasks];
+    
+    return { uncompletedTasks: sortedUncompleted, completedTasks: sortedCompleted };
+  }, [tasks]);
 
   const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +101,7 @@ const TaskList = () => {
   };
 
   return (
-    <Card className="w-full h-[450px] flex flex-col"> {/* Fixed height to match progress chart */}
+    <Card className="w-full h-[450px] flex flex-col">
       <CardHeader className="pb-2 flex flex-row items-center justify-between shrink-0">
         <CardTitle className="flex items-center gap-2">
           <ListTodo className="h-5 w-5" />
@@ -145,50 +167,106 @@ const TaskList = () => {
           </DialogContent>
         </Dialog>
       </CardHeader>
-      <CardContent className="flex-1 overflow-y-auto">
+      <CardContent className="flex-1 overflow-y-auto p-2 pt-4">
         {tasks.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             No tasks yet. Add your first task to get started!
           </div>
         ) : (
-          <div className="space-y-2">
-            {tasks.map((task) => (
-              <div 
-                key={task.id} 
-                className={`p-3 rounded-md flex items-start gap-3 transition-colors ${getPriorityClass(task.priority)} cursor-move`}
-                draggable={true}
-                onDragStart={(e) => handleDragStart(e, task.id)}
-                onDragEnd={handleDragEnd}
-              >
-                <Checkbox 
-                  checked={task.completed} 
-                  onCheckedChange={() => toggleTaskCompletion(task.id)}
-                  className="mt-1"
-                />
-                <div className="flex-1">
-                  <div className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
-                    {task.title}
-                  </div>
-                  {task.description && (
-                    <div className={`text-sm mt-1 ${task.completed ? 'line-through text-muted-foreground' : 'text-muted-foreground'}`}>
-                      {task.description}
+          <div className="space-y-4">
+            {sortedTasks.uncompletedTasks.length > 0 && (
+              <div className="space-y-2">
+                {sortedTasks.uncompletedTasks.map((task) => (
+                  <div 
+                    key={task.id} 
+                    className={`p-3 rounded-md flex items-start gap-3 transition-colors ${getPriorityClass(task.priority)} cursor-move`}
+                    draggable={true}
+                    onDragStart={(e) => handleDragStart(e, task.id)}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <Checkbox 
+                      checked={task.completed} 
+                      onCheckedChange={() => toggleTaskCompletion(task.id)}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <div className="font-medium">
+                        {task.title}
+                      </div>
+                      {task.description && (
+                        <div className="text-sm mt-1 text-muted-foreground">
+                          {task.description}
+                        </div>
+                      )}
+                      <div className="text-xs mt-1 flex items-center text-muted-foreground">
+                        <Clock className="h-3 w-3 mr-1" />
+                        Time spent: {formatTimeSpent(task.timeSpent)}
+                      </div>
                     </div>
-                  )}
-                  <div className="text-xs mt-1 flex items-center text-muted-foreground">
-                    <Clock className="h-3 w-3 mr-1" />
-                    Time spent: {formatTimeSpent(task.timeSpent)}
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      onClick={() => deleteTask(task.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                  onClick={() => deleteTask(task.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                ))}
               </div>
-            ))}
+            )}
+            
+            {sortedTasks.uncompletedTasks.length > 0 && sortedTasks.completedTasks.length > 0 && (
+              <div className="my-4">
+                <Separator className="my-2" />
+                <div className="text-xs font-medium text-muted-foreground text-center">
+                  Completed Tasks
+                </div>
+                <Separator className="my-2" />
+              </div>
+            )}
+            
+            {sortedTasks.completedTasks.length > 0 && (
+              <div className="space-y-2">
+                {sortedTasks.completedTasks.map((task) => (
+                  <div 
+                    key={task.id} 
+                    className={`p-3 rounded-md flex items-start gap-3 transition-colors bg-muted/40 cursor-move`}
+                    draggable={true}
+                    onDragStart={(e) => handleDragStart(e, task.id)}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <Checkbox 
+                      checked={task.completed} 
+                      onCheckedChange={() => toggleTaskCompletion(task.id)}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <div className="font-medium line-through text-muted-foreground">
+                        {task.title}
+                      </div>
+                      {task.description && (
+                        <div className="text-sm mt-1 line-through text-muted-foreground">
+                          {task.description}
+                        </div>
+                      )}
+                      <div className="text-xs mt-1 flex items-center text-muted-foreground">
+                        <Clock className="h-3 w-3 mr-1" />
+                        Time spent: {formatTimeSpent(task.timeSpent)}
+                      </div>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      onClick={() => deleteTask(task.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </CardContent>

@@ -5,6 +5,7 @@ import PomodoroTimer from '@/components/PomodoroTimer';
 import TaskList from '@/components/TaskList';
 import ProgressChart from '@/components/ProgressChart';
 import DistractionTracker from '@/components/DistractionTracker';
+import FocusReminder from '@/components/FocusReminder';
 
 const Index = () => {
   return (
@@ -36,6 +37,8 @@ const Index = () => {
             <p>FlowZone &copy; {new Date().getFullYear()} - Stay productive and focused</p>
           </div>
         </footer>
+        
+        <FocusReminder />
       </div>
     </ProcrastinationProvider>
   );
