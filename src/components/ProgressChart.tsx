@@ -146,7 +146,7 @@ const ProgressChart = () => {
                     <XAxis type="number" tickFormatter={formatMinutes} />
                     <YAxis type="category" dataKey="name" width={100} />
                     <Tooltip formatter={(value) => [`${formatMinutes(Number(value))}`, 'Time Spent']} />
-                    <Bar dataKey="value" nameKey="name">
+                    <Bar dataKey="value">
                       {timeSpentData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
