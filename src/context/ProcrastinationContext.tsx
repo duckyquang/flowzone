@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Task, PomodoroSettings, DistractionData } from '@/types/procrastination';
 import { toast } from '@/components/ui/sonner';
@@ -108,8 +107,8 @@ export const ProcrastinationProvider = ({ children }: { children: React.ReactNod
     const newTask: Task = {
       ...task,
       id: Date.now().toString(),
-      completed: false,
-      createdAt: new Date().toISOString()
+      completed: task.completed,
+      createdAt: task.createdAt
     };
     setTasks(currentTasks => [...currentTasks, newTask]);
   };

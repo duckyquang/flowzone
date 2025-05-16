@@ -33,6 +33,8 @@ const TaskList = () => {
       title: newTaskTitle.trim(),
       description: newTaskDescription.trim(),
       priority: newTaskPriority,
+      completed: false,
+      createdAt: new Date().toISOString()
     });
 
     toast('Task Added', {
