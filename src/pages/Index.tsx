@@ -1,13 +1,43 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React from 'react';
+import { ProcrastinationProvider } from '@/context/ProcrastinationContext';
+import PomodoroTimer from '@/components/PomodoroTimer';
+import TaskList from '@/components/TaskList';
+import ProgressChart from '@/components/ProgressChart';
+import DistractionTracker from '@/components/DistractionTracker';
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <ProcrastinationProvider>
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
+        <div className="container py-8 px-4 mx-auto">
+          <header className="mb-8 text-center">
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-focus-blue to-focus-teal bg-clip-text text-transparent">Focus Fighter</h1>
+            <p className="text-muted-foreground">Beat procrastination and stay focused on what matters.</p>
+          </header>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <div className="space-y-8">
+                <PomodoroTimer />
+                <TaskList />
+              </div>
+            </div>
+            
+            <div className="space-y-8">
+              <DistractionTracker />
+              <ProgressChart />
+            </div>
+          </div>
+        </div>
+        
+        <footer className="py-6 border-t mt-12">
+          <div className="container text-center text-sm text-muted-foreground">
+            <p>Focus Fighter &copy; {new Date().getFullYear()} - Stay productive and focused</p>
+          </div>
+        </footer>
       </div>
-    </div>
+    </ProcrastinationProvider>
   );
 };
 
