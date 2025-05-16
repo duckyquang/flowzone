@@ -57,8 +57,8 @@ const TaskList = () => {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-2 flex flex-row items-center justify-between">
+    <Card className="w-full h-[450px] flex flex-col"> {/* Fixed height to match progress chart */}
+      <CardHeader className="pb-2 flex flex-row items-center justify-between shrink-0">
         <CardTitle className="flex items-center gap-2">
           <ListTodo className="h-5 w-5" />
           Tasks
@@ -123,7 +123,7 @@ const TaskList = () => {
           </DialogContent>
         </Dialog>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1 overflow-y-auto">
         {tasks.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             No tasks yet. Add your first task to get started!

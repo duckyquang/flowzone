@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Task, PomodoroSettings, DistractionData } from '@/types/procrastination';
 import { toast } from '@/components/ui/sonner';
@@ -31,42 +32,79 @@ export const ProcrastinationProvider = ({ children }: { children: React.ReactNod
     count: 0,
     lastDate: new Date().toDateString()
   });
+  const [isFirstVisit, setIsFirstVisit] = useState(true);
 
-  // Load data from localStorage on mount
+  // Load data from localStorage on mount and check if it's first visit
   useEffect(() => {
-    const savedTasks = localStorage.getItem('procrastination_tasks');
-    const savedPomodoroSettings = localStorage.getItem('procrastination_pomodoro');
-    const savedDistractions = localStorage.getItem('procrastination_distractions');
+    const firstVisitCheck = localStorage.getItem('flowzone_first_visit');
+    
+    if (!firstVisitCheck) {
+      // It's the first visit, reset everything
+      localStorage.setItem('flowzone_first_visit', 'false');
+      resetAllData();
+    } else {
+      // Not first visit, load data normally
+      const savedTasks = localStorage.getItem('procrastination_tasks');
+      const savedPomodoroSettings = localStorage.getItem('procrastination_pomodoro');
+      const savedDistractions = localStorage.getItem('procrastination_distractions');
 
-    if (savedTasks) setTasks(JSON.parse(savedTasks));
-    if (savedPomodoroSettings) setPomodoroSettings(JSON.parse(savedPomodoroSettings));
-    if (savedDistractions) {
-      const parsedDistractions = JSON.parse(savedDistractions);
-      
-      // Reset distractions if it's a new day
-      if (parsedDistractions.lastDate !== new Date().toDateString()) {
-        setDistractions({
-          count: 0,
-          lastDate: new Date().toDateString()
-        });
-      } else {
-        setDistractions(parsedDistractions);
+      if (savedTasks) setTasks(JSON.parse(savedTasks));
+      if (savedPomodoroSettings) setPomodoroSettings(JSON.parse(savedPomodoroSettings));
+      if (savedDistractions) {
+        const parsedDistractions = JSON.parse(savedDistractions);
+        
+        // Reset distractions if it's a new day
+        if (parsedDistractions.lastDate !== new Date().toDateString()) {
+          setDistractions({
+            count: 0,
+            lastDate: new Date().toDateString()
+          });
+        } else {
+          setDistractions(parsedDistractions);
+        }
       }
+      setIsFirstVisit(false);
     }
   }, []);
 
+  // Function to reset all data
+  const resetAllData = () => {
+    setTasks([]);
+    setPomodoroSettings(defaultPomodoroSettings);
+    setDistractions({
+      count: 0,
+      lastDate: new Date().toDateString()
+    });
+    
+    // Clear localStorage
+    localStorage.removeItem('procrastination_tasks');
+    localStorage.removeItem('procrastination_pomodoro');
+    localStorage.removeItem('procrastination_distractions');
+    
+    toast('Welcome to FlowZone!', {
+      description: 'All your data has been reset. Start fresh and stay focused!',
+      duration: 5000
+    });
+  };
+
   // Save data to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem('procrastination_tasks', JSON.stringify(tasks));
-  }, [tasks]);
+    if (!isFirstVisit) {
+      localStorage.setItem('procrastination_tasks', JSON.stringify(tasks));
+    }
+  }, [tasks, isFirstVisit]);
 
   useEffect(() => {
-    localStorage.setItem('procrastination_pomodoro', JSON.stringify(pomodoroSettings));
-  }, [pomodoroSettings]);
+    if (!isFirstVisit) {
+      localStorage.setItem('procrastination_pomodoro', JSON.stringify(pomodoroSettings));
+    }
+  }, [pomodoroSettings, isFirstVisit]);
 
   useEffect(() => {
-    localStorage.setItem('procrastination_distractions', JSON.stringify(distractions));
-  }, [distractions]);
+    if (!isFirstVisit) {
+      localStorage.setItem('procrastination_distractions', JSON.stringify(distractions));
+    }
+  }, [distractions, isFirstVisit]);
 
   // Track tab visibility changes
   useEffect(() => {

@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react';
 import { useProcrastination } from '@/context/ProcrastinationContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { ChartLine, CheckCheck } from 'lucide-react';
 
 const ProgressChart = () => {
@@ -13,26 +13,16 @@ const ProgressChart = () => {
     return Math.round((completedTasksCount / tasks.length) * 100);
   }, [tasks, completedTasksCount]);
 
-  // Generate dummy data for chart demonstration 
-  // In a real app, this would come from historical task completion data
-  const chartData = useMemo(() => {
-    const today = new Date();
-    return Array.from({ length: 7 }, (_, i) => {
-      const date = new Date();
-      date.setDate(today.getDate() - (6 - i));
-      
-      // Generate some random data for past days
-      // In a real app, this would be actual historical data
-      let completedCount = i < 6 
-        ? Math.floor(Math.random() * 8) 
-        : completedTasksCount;
-        
-      return {
-        date: date.toLocaleDateString('en-US', { weekday: 'short' }),
-        completed: completedCount,
-      };
-    });
-  }, [completedTasksCount]);
+  const pieData = useMemo(() => {
+    if (tasks.length === 0) {
+      return [{ name: 'No Tasks', value: 1, color: '#e2e8f0' }];
+    }
+    
+    return [
+      { name: 'Completed', value: completedTasksCount, color: '#10B981' },
+      { name: 'Remaining', value: tasks.length - completedTasksCount, color: '#3B82F6' }
+    ];
+  }, [tasks.length, completedTasksCount]);
 
   return (
     <Card className="w-full">
@@ -60,27 +50,33 @@ const ProgressChart = () => {
           </div>
         </div>
         
-        <div className="h-[200px] w-full">
+        <div className="h-[200px] w-full flex items-center justify-center">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="date" />
-              <YAxis 
-                allowDecimals={false}
-                tickCount={5}
-                domain={[0, 'dataMax + 1']}
+            <PieChart>
+              <Pie
+                data={pieData}
+                cx="50%"
+                cy="50%"
+                innerRadius={30}
+                outerRadius={80}
+                paddingAngle={5}
+                dataKey="value"
+                labelLine={false}
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+              >
+                {pieData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value, name) => [`${value} tasks`, name]}
               />
-              <Tooltip 
-                formatter={(value) => [`${value} tasks`, 'Completed']}
-                labelFormatter={(label) => `${label}`}
+              <Legend 
+                layout="horizontal" 
+                verticalAlign="bottom" 
+                align="center" 
               />
-              <Bar 
-                dataKey="completed" 
-                name="Tasks Completed" 
-                fill="#3B82F6" 
-                radius={[4, 4, 0, 0]} 
-              />
-            </BarChart>
+            </PieChart>
           </ResponsiveContainer>
         </div>
       </CardContent>

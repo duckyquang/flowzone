@@ -12,7 +12,7 @@ const Index = () => {
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
         <div className="container py-8 px-4 mx-auto">
           <header className="mb-8 text-center">
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-focus-blue to-focus-teal bg-clip-text text-transparent">Focus Fighter</h1>
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-focus-blue to-focus-teal bg-clip-text text-transparent">FlowZone</h1>
             <p className="text-muted-foreground">Beat procrastination and stay focused on what matters.</p>
           </header>
 
@@ -33,7 +33,7 @@ const Index = () => {
         
         <footer className="py-6 border-t mt-12">
           <div className="container text-center text-sm text-muted-foreground">
-            <p>Focus Fighter &copy; {new Date().getFullYear()} - Stay productive and focused</p>
+            <p>FlowZone &copy; {new Date().getFullYear()} - Stay productive and focused</p>
           </div>
         </footer>
       </div>
