@@ -77,36 +77,35 @@ const ProgressChart = () => {
           </TabsList>
           
           <TabsContent value="completion" className="mt-0 space-y-4">
-            <div className="flex flex-wrap gap-6 items-center justify-between">
-              <div className="flex items-center gap-3 bg-muted/50 p-3 rounded-lg">
-                <CheckCheck className="text-focus-green h-6 w-6" />
+            <div className="flex flex-wrap gap-4 items-center justify-between">
+              <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-lg">
+                <CheckCheck className="text-focus-green h-5 w-5" />
                 <div>
                   <div className="text-sm font-medium">Task Completion</div>
-                  <div className="text-xl font-bold">{completedTasksCount} / {tasks.length}</div>
+                  <div className="text-lg font-bold">{completedTasksCount} / {tasks.length}</div>
                 </div>
               </div>
               
-              <div className="flex items-center gap-3 bg-muted/50 p-3 rounded-lg">
+              <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-lg">
                 <div className="text-sm font-medium">Completion Rate</div>
-                <div className="text-xl font-bold">
+                <div className="text-lg font-bold">
                   {tasks.length > 0 ? `${completionRate}%` : 'N/A'}
                 </div>
               </div>
             </div>
             
-            <div className="flex items-center justify-center px-3 py-2 min-h-[180px]">
-              <ResponsiveContainer width="100%" height={180}>
-                <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+            <div className="h-[190px] flex items-center justify-center">
+              <ResponsiveContainer width="100%" height={190}>
+                <PieChart>
                   <Pie
                     data={pieData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={35}
-                    outerRadius={70}
+                    innerRadius={30}
+                    outerRadius={60}
                     paddingAngle={5}
                     dataKey="value"
                     labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                   >
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -119,9 +118,9 @@ const ProgressChart = () => {
                   <Legend 
                     layout="horizontal" 
                     verticalAlign="bottom" 
-                    align="center" 
-                    wrapperStyle={{ paddingTop: "20px", marginBottom: "0" }}
-                    iconSize={10}
+                    align="center"
+                    wrapperStyle={{ paddingTop: "15px" }}
+                    iconSize={8}
                     iconType="circle"
                   />
                 </PieChart>
@@ -130,32 +129,37 @@ const ProgressChart = () => {
           </TabsContent>
           
           <TabsContent value="timeSpent" className="mt-0 space-y-4">
-            <div className="py-3 px-4 rounded-lg bg-muted/50">
-              <div className="flex items-center gap-3">
+            <div className="py-2 px-3 rounded-lg bg-muted/50">
+              <div className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-focus-blue" />
                 <div>
                   <div className="text-sm font-medium">Time Allocation</div>
-                  <div className="text-xl font-bold">Top {Math.min(5, timeSpentData.length)} Tasks</div>
+                  <div className="text-lg font-bold">Top {Math.min(5, timeSpentData.length)} Tasks</div>
                 </div>
               </div>
             </div>
             
-            <div className="flex items-center justify-center px-3 py-2 min-h-[180px]">
-              <ResponsiveContainer width="100%" height={180}>
+            <div className="h-[190px] flex items-center justify-center">
+              <ResponsiveContainer width="100%" height={190}>
                 {timeSpentData.length > 0 ? (
                   <BarChart
                     data={timeSpentData}
                     layout="vertical"
-                    margin={{ top: 10, right: 40, left: 40, bottom: 10 }}
+                    margin={{ top: 5, right: 30, left: 40, bottom: 20 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                     <XAxis type="number" tickFormatter={formatMinutes} />
-                    <YAxis type="category" dataKey="name" width={100} />
+                    <YAxis 
+                      type="category" 
+                      dataKey="name" 
+                      width={80}
+                      tick={{ fontSize: 11 }}
+                    />
                     <Tooltip 
                       formatter={(value) => [`${formatMinutes(Number(value))}`, 'Time Spent']}
                       contentStyle={{ padding: '6px', borderRadius: '6px' }}
                     />
-                    <Bar dataKey="value" barSize={15}>
+                    <Bar dataKey="value" barSize={12}>
                       {timeSpentData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
@@ -163,7 +167,7 @@ const ProgressChart = () => {
                         dataKey="value" 
                         position="right"
                         formatter={formatMinutes}
-                        style={{ fontWeight: 'bold', fontSize: '12px' }}
+                        style={{ fontWeight: 'bold', fontSize: '11px' }}
                       />
                     </Bar>
                   </BarChart>
