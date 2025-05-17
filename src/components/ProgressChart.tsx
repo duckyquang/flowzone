@@ -62,47 +62,47 @@ const ProgressChart = () => {
   };
 
   return (
-    <Card className="w-full h-[450px]">
-      <CardHeader className="pb-0">
-        <CardTitle className="flex items-center gap-2">
-          <ChartLine className="h-5 w-5" />
+    <Card className="w-full h-full">
+      <CardHeader className="pb-2 pt-6">
+        <CardTitle className="flex items-center gap-3 text-2xl">
+          <ChartLine className="h-6 w-6" />
           Productivity Progress
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0 h-[calc(100%-60px)]">
+      <CardContent className="pt-4 h-[calc(100%-80px)]">
         <Tabs defaultValue="completion" className="h-full">
-          <TabsList className="mb-6 grid grid-cols-2">
-            <TabsTrigger value="completion">Task Completion</TabsTrigger>
-            <TabsTrigger value="timeSpent">Time Spent</TabsTrigger>
+          <TabsList className="mb-8 grid grid-cols-2 gap-2">
+            <TabsTrigger value="completion" className="py-3">Task Completion</TabsTrigger>
+            <TabsTrigger value="timeSpent" className="py-3">Time Spent</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="completion" className="h-[350px]">
-            <div className="mb-8 flex flex-wrap gap-8 items-center justify-center sm:justify-between">
-              <div className="flex items-center gap-4 bg-muted/50 p-4 px-6 rounded-md">
-                <CheckCheck className="text-focus-green h-6 w-6" />
+          <TabsContent value="completion" className="h-[calc(100%-60px)]">
+            <div className="mb-12 flex flex-wrap gap-10 items-center justify-center sm:justify-between">
+              <div className="flex items-center gap-6 bg-muted/50 p-6 px-8 rounded-lg shadow-sm">
+                <CheckCheck className="text-focus-green h-8 w-8" />
                 <div>
-                  <div className="text-sm font-medium">Task Completion</div>
-                  <div className="text-2xl font-bold">{completedTasksCount} / {tasks.length}</div>
+                  <div className="text-base font-medium mb-1">Task Completion</div>
+                  <div className="text-3xl font-bold">{completedTasksCount} / {tasks.length}</div>
                 </div>
               </div>
               
-              <div className="flex items-center gap-4 bg-muted/50 p-4 px-6 rounded-md">
-                <div className="text-sm font-medium">Completion Rate</div>
-                <div className="text-2xl font-bold">
+              <div className="flex items-center gap-6 bg-muted/50 p-6 px-8 rounded-lg shadow-sm">
+                <div className="text-base font-medium mb-1">Completion Rate</div>
+                <div className="text-3xl font-bold">
                   {tasks.length > 0 ? `${completionRate}%` : 'N/A'}
                 </div>
               </div>
             </div>
             
-            <div className="h-[220px] w-full flex items-center justify-center px-4">
+            <div className="h-[260px] w-full flex items-center justify-center px-4 mt-8">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
+                <PieChart margin={{ top: 20, right: 40, bottom: 20, left: 40 }}>
                   <Pie
                     data={pieData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={30}
-                    outerRadius={80}
+                    innerRadius={40}
+                    outerRadius={90}
                     paddingAngle={5}
                     dataKey="value"
                     labelLine={false}
@@ -114,52 +114,59 @@ const ProgressChart = () => {
                   </Pie>
                   <Tooltip
                     formatter={(value, name) => [`${value} tasks`, name]}
+                    contentStyle={{ padding: '10px', borderRadius: '8px' }}
                   />
                   <Legend 
                     layout="horizontal" 
                     verticalAlign="bottom" 
                     align="center" 
-                    wrapperStyle={{ paddingTop: "20px" }}
+                    wrapperStyle={{ paddingTop: "30px" }}
+                    iconSize={10}
+                    iconType="circle"
                   />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           </TabsContent>
           
-          <TabsContent value="timeSpent" className="h-[350px]">
-            <div className="mb-8 flex items-center gap-4 bg-muted/50 p-4 px-6 rounded-md">
-              <Clock className="h-6 w-6 text-focus-blue" />
+          <TabsContent value="timeSpent" className="h-[calc(100%-60px)]">
+            <div className="mb-10 flex items-center gap-6 bg-muted/50 p-6 px-8 rounded-lg shadow-sm">
+              <Clock className="h-7 w-7 text-focus-blue" />
               <div>
-                <div className="text-sm font-medium">Time Allocation</div>
-                <div className="text-xl font-bold">Top {Math.min(5, timeSpentData.length)} Tasks</div>
+                <div className="text-base font-medium mb-1">Time Allocation</div>
+                <div className="text-2xl font-bold">Top {Math.min(5, timeSpentData.length)} Tasks</div>
               </div>
             </div>
             
-            <div className="h-[260px] w-full px-6">
+            <div className="h-[280px] w-full px-8 mt-8">
               <ResponsiveContainer width="100%" height="100%">
                 {timeSpentData.length > 0 ? (
                   <BarChart
                     data={timeSpentData}
                     layout="vertical"
-                    margin={{ top: 10, right: 40, left: 40, bottom: 20 }}
+                    margin={{ top: 20, right: 50, left: 50, bottom: 30 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                     <XAxis type="number" tickFormatter={formatMinutes} />
-                    <YAxis type="category" dataKey="name" width={120} />
-                    <Tooltip formatter={(value) => [`${formatMinutes(Number(value))}`, 'Time Spent']} />
-                    <Bar dataKey="value">
+                    <YAxis type="category" dataKey="name" width={130} />
+                    <Tooltip 
+                      formatter={(value) => [`${formatMinutes(Number(value))}`, 'Time Spent']}
+                      contentStyle={{ padding: '10px', borderRadius: '8px' }}
+                    />
+                    <Bar dataKey="value" barSize={20}>
                       {timeSpentData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                       <LabelList 
                         dataKey="value" 
                         position="right"
-                        formatter={formatMinutes} 
+                        formatter={formatMinutes}
+                        style={{ fontWeight: 'bold' }}
                       />
                     </Bar>
                   </BarChart>
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center text-muted-foreground">
+                  <div className="h-full w-full flex items-center justify-center text-muted-foreground text-lg">
                     No time data available yet. Start working on tasks!
                   </div>
                 )}
