@@ -70,23 +70,23 @@ const ProgressChart = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0 h-[calc(100%-60px)]">
-        <Tabs defaultValue="completion">
-          <TabsList className="mb-4 grid grid-cols-2">
+        <Tabs defaultValue="completion" className="h-full">
+          <TabsList className="mb-6 grid grid-cols-2">
             <TabsTrigger value="completion">Task Completion</TabsTrigger>
             <TabsTrigger value="timeSpent">Time Spent</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="completion" className="h-[320px]">
-            <div className="mb-4 flex flex-wrap gap-6 items-center justify-center sm:justify-between">
-              <div className="flex items-center gap-3 bg-muted/50 p-3 px-4 rounded-md">
-                <CheckCheck className="text-focus-green h-5 w-5" />
+          <TabsContent value="completion" className="h-[350px]">
+            <div className="mb-8 flex flex-wrap gap-8 items-center justify-center sm:justify-between">
+              <div className="flex items-center gap-4 bg-muted/50 p-4 px-6 rounded-md">
+                <CheckCheck className="text-focus-green h-6 w-6" />
                 <div>
                   <div className="text-sm font-medium">Task Completion</div>
                   <div className="text-2xl font-bold">{completedTasksCount} / {tasks.length}</div>
                 </div>
               </div>
               
-              <div className="flex items-center gap-3 bg-muted/50 p-3 px-4 rounded-md">
+              <div className="flex items-center gap-4 bg-muted/50 p-4 px-6 rounded-md">
                 <div className="text-sm font-medium">Completion Rate</div>
                 <div className="text-2xl font-bold">
                   {tasks.length > 0 ? `${completionRate}%` : 'N/A'}
@@ -119,29 +119,29 @@ const ProgressChart = () => {
                     layout="horizontal" 
                     verticalAlign="bottom" 
                     align="center" 
-                    wrapperStyle={{ paddingTop: "15px" }}
+                    wrapperStyle={{ paddingTop: "20px" }}
                   />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           </TabsContent>
           
-          <TabsContent value="timeSpent" className="h-[320px]">
-            <div className="mb-4 flex items-center gap-3 bg-muted/50 p-3 px-4 rounded-md">
-              <Clock className="h-5 w-5 text-focus-blue" />
+          <TabsContent value="timeSpent" className="h-[350px]">
+            <div className="mb-8 flex items-center gap-4 bg-muted/50 p-4 px-6 rounded-md">
+              <Clock className="h-6 w-6 text-focus-blue" />
               <div>
                 <div className="text-sm font-medium">Time Allocation</div>
                 <div className="text-xl font-bold">Top {Math.min(5, timeSpentData.length)} Tasks</div>
               </div>
             </div>
             
-            <div className="h-[260px] w-full px-4">
+            <div className="h-[260px] w-full px-6">
               <ResponsiveContainer width="100%" height="100%">
                 {timeSpentData.length > 0 ? (
                   <BarChart
                     data={timeSpentData}
                     layout="vertical"
-                    margin={{ top: 5, right: 30, left: 30, bottom: 20 }}
+                    margin={{ top: 10, right: 40, left: 40, bottom: 20 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                     <XAxis type="number" tickFormatter={formatMinutes} />
