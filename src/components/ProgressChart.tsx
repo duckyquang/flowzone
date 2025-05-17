@@ -62,41 +62,41 @@ const ProgressChart = () => {
   };
 
   return (
-    <Card className="w-full h-full">
+    <Card className="w-full h-full flex flex-col">
       <CardHeader className="pb-2 pt-6">
         <CardTitle className="flex items-center gap-3 text-2xl">
           <ChartLine className="h-6 w-6" />
           Productivity Progress
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4 h-[calc(100%-80px)]">
-        <Tabs defaultValue="completion" className="h-full">
-          <TabsList className="mb-8 grid grid-cols-2 gap-2">
+      <CardContent className="pt-4 flex-1 flex flex-col">
+        <Tabs defaultValue="completion" className="flex-1 flex flex-col">
+          <TabsList className="mb-6 grid grid-cols-2 gap-2">
             <TabsTrigger value="completion" className="py-3">Task Completion</TabsTrigger>
             <TabsTrigger value="timeSpent" className="py-3">Time Spent</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="completion" className="h-[calc(100%-60px)]">
-            <div className="mb-12 flex flex-wrap gap-10 items-center justify-center sm:justify-between">
+          <TabsContent value="completion" className="flex-1 flex flex-col space-y-8">
+            <div className="flex flex-wrap gap-x-10 gap-y-6 items-center justify-center sm:justify-between">
               <div className="flex items-center gap-6 bg-muted/50 p-6 px-8 rounded-lg shadow-sm">
                 <CheckCheck className="text-focus-green h-8 w-8" />
                 <div>
-                  <div className="text-base font-medium mb-1">Task Completion</div>
+                  <div className="text-base font-medium mb-2">Task Completion</div>
                   <div className="text-3xl font-bold">{completedTasksCount} / {tasks.length}</div>
                 </div>
               </div>
               
               <div className="flex items-center gap-6 bg-muted/50 p-6 px-8 rounded-lg shadow-sm">
-                <div className="text-base font-medium mb-1">Completion Rate</div>
+                <div className="text-base font-medium mb-2">Completion Rate</div>
                 <div className="text-3xl font-bold">
                   {tasks.length > 0 ? `${completionRate}%` : 'N/A'}
                 </div>
               </div>
             </div>
             
-            <div className="h-[260px] w-full flex items-center justify-center px-4 mt-8">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart margin={{ top: 20, right: 40, bottom: 20, left: 40 }}>
+            <div className="flex-1 flex items-center justify-center px-8 py-8 min-h-[260px]">
+              <ResponsiveContainer width="100%" height="100%" minHeight={220}>
+                <PieChart margin={{ top: 20, right: 50, bottom: 20, left: 50 }}>
                   <Pie
                     data={pieData}
                     cx="50%"
@@ -120,8 +120,8 @@ const ProgressChart = () => {
                     layout="horizontal" 
                     verticalAlign="bottom" 
                     align="center" 
-                    wrapperStyle={{ paddingTop: "30px" }}
-                    iconSize={10}
+                    wrapperStyle={{ paddingTop: "40px", marginBottom: "20px" }}
+                    iconSize={12}
                     iconType="circle"
                   />
                 </PieChart>
@@ -129,22 +129,24 @@ const ProgressChart = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="timeSpent" className="h-[calc(100%-60px)]">
-            <div className="mb-10 flex items-center gap-6 bg-muted/50 p-6 px-8 rounded-lg shadow-sm">
-              <Clock className="h-7 w-7 text-focus-blue" />
-              <div>
-                <div className="text-base font-medium mb-1">Time Allocation</div>
-                <div className="text-2xl font-bold">Top {Math.min(5, timeSpentData.length)} Tasks</div>
+          <TabsContent value="timeSpent" className="flex-1 flex flex-col space-y-8">
+            <div className="py-6 px-8 rounded-lg shadow-sm bg-muted/50">
+              <div className="flex items-center gap-6">
+                <Clock className="h-7 w-7 text-focus-blue" />
+                <div>
+                  <div className="text-base font-medium mb-2">Time Allocation</div>
+                  <div className="text-2xl font-bold">Top {Math.min(5, timeSpentData.length)} Tasks</div>
+                </div>
               </div>
             </div>
             
-            <div className="h-[280px] w-full px-8 mt-8">
-              <ResponsiveContainer width="100%" height="100%">
+            <div className="flex-1 flex items-center justify-center px-8 py-6 min-h-[280px]">
+              <ResponsiveContainer width="100%" height="100%" minHeight={220}>
                 {timeSpentData.length > 0 ? (
                   <BarChart
                     data={timeSpentData}
                     layout="vertical"
-                    margin={{ top: 20, right: 50, left: 50, bottom: 30 }}
+                    margin={{ top: 20, right: 60, left: 60, bottom: 40 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                     <XAxis type="number" tickFormatter={formatMinutes} />
